@@ -2,7 +2,11 @@ package io.paradaux.webapi.models;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Configuration {
+import java.io.Serializable;
+
+public class Configuration implements Serializable {
+
+    public static final long serialVersionUID = 2L;
 
     @SerializedName("mongo_uri")
     private final String mongoUri;
@@ -17,5 +21,9 @@ public class Configuration {
 
     public String getMongoUri() {
         return mongoUri;
+    }
+
+    public String getContactFormWebhook() {
+        return contactFormWebhook;
     }
 }
