@@ -59,7 +59,7 @@ public class WebApiApplication {
     }
 
     @RequestMapping(value = "/website/contact-form", method = RequestMethod.GET,produces = MediaType.APPLICATION_JSON_VALUE)
-    public String handleInterestForms(@RequestParam(value = "contact-name") String name,
+    public String handleContactForms(@RequestParam(value = "contact-name") String name,
                                       @RequestParam(value = "contact-email") String email,
                                       @RequestParam(value = "contact-subject") String subject,
                                       @RequestParam(value = "contact-message") String message) {
