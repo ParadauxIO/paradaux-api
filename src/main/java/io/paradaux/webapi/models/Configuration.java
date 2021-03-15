@@ -7,8 +7,12 @@ public class Configuration {
     @SerializedName("mongo_uri")
     private final String mongoUri;
 
-    public Configuration(String mongoUri) {
+    @SerializedName("contact_form_webhook")
+    private final String contactFormWebhook;
+
+    public Configuration(String mongoUri, String contactFormWebhook) {
         this.mongoUri = mongoUri;
+        this.contactFormWebhook = contactFormWebhook;
     }
 
     public String getMongoUri() {
