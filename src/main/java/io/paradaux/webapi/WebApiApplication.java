@@ -3,12 +3,11 @@ package io.paradaux.webapi;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import io.paradaux.webapi.managers.DiscordWebhookManager;
 import io.paradaux.webapi.managers.IOManager;
 import io.paradaux.webapi.managers.MongoManager;
 import io.paradaux.webapi.models.Configuration;
-import io.paradaux.webapi.models.ContactFormSubmission;
+import io.paradaux.webapi.models.database.ContactFormSubmission;
 import io.paradaux.webapi.models.database.TagEntry;
 import io.paradaux.webapi.utils.StringUtils;
 import org.springframework.boot.SpringApplication;
@@ -56,6 +55,12 @@ public class WebApiApplication {
         }
 
         return gson.toJson(array);
+    }
+
+    @CrossOrigin(origins = "*")
+    @RequestMapping(value = "/friendly-bot/stats", method = RequestMethod.GET,produces = MediaType.APPLICATION_JSON_VALUE)
+    public String handleBotStats() {
+        return new Gson().toJson(mongo.getBotStats());
     }
 
     @RequestMapping(value = "/website/contact-form", method = RequestMethod.GET,produces = MediaType.APPLICATION_JSON_VALUE)
