@@ -1,4 +1,4 @@
-package io.paradaux.webapi.models;
+package io.paradaux.webapi.models.database;
 
 import java.io.Serializable;
 

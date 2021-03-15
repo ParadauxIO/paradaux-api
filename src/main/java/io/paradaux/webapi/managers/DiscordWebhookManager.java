@@ -6,7 +6,7 @@ import club.minnced.discord.webhook.send.WebhookEmbed;
 import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import io.paradaux.webapi.models.Configuration;
-import io.paradaux.webapi.models.ContactFormSubmission;
+import io.paradaux.webapi.models.database.ContactFormSubmission;
 import org.springframework.lang.NonNull;
 
 public class DiscordWebhookManager {
