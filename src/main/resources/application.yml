@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: paradaux-api
+
+cloudflare:
+  turnstile:
+    secret: ${CLOUDFLARE_TURNSTILE_SECRET}
+
+discord:
+  webhook: ${DISCORD_WEBHOOK}
