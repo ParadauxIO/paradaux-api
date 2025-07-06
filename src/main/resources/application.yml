@@ -8,3 +8,7 @@ cloudflare:
 
 discord:
   webhook: ${DISCORD_WEBHOOK}
+
+mybatis:
+  type-aliases-package: io.paradaux.api.models
+  mapper-locations: classpath:mappers/*.xml
