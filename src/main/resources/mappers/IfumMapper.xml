@@ -20,8 +20,4 @@
     <select id="getVisitCount" parameterType="int" resultType="Integer">
         SELECT COUNT(*) AS count FROM ifum.visits
     </select>
-
-
-
-
 </mapper>
