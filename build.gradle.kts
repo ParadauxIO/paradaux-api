@@ -25,20 +25,21 @@ repositories {
 
 dependencies {
     // Spring core
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("org.springframework.boot:spring-boot-starter-web:3.5.3")
+    implementation("org.springframework.boot:spring-boot-starter-webflux:3.5.3")
+
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3")
+    implementation("org.postgresql:postgresql:42.7.3")
+
+    runtimeOnly("org.postgresql:postgresql")
 
     // Development tools
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     compileOnly("org.projectlombok:lombok")
-
     annotationProcessor("org.projectlombok:lombok")
 
-    // DB
-//    implementation("org.springframework.boot:spring-boot-starter-jdbc")
-//    implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3")
-//    runtimeOnly("org.postgresql:postgresql")
-//    implementation("org.liquibase:liquibase-core")
+
 
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
