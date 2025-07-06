@@ -13,5 +13,7 @@ CREATE TABLE IF NOT EXISTS api.contact_form_responses
 CREATE SCHEMA IF NOT EXISTS ifum;
 CREATE TABLE IF NOT EXISTS ifum.visits (
     id         SERIAL PRIMARY KEY,
+    ip_address VARCHAR(45) UNIQUE NOT NULL,
+    user_agent TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

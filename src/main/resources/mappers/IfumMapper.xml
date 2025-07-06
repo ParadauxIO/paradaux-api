@@ -9,11 +9,19 @@
         <result property="createdAt" column="created_at"/>
     </resultMap>
 
-    <insert id="insertVisit">
-        INSERT INTO ifum.visits DEFAULT VALUES
+    <insert id="insertVisit" parameterType="IfumVisit">
+        INSERT INTO ifum.visits (ip_address, user_agent)
+        SELECT #{ipAddress}, #{userAgent}
+        WHERE NOT EXISTS (
+            SELECT 1 FROM ifum.visits WHERE ip_address = #{ipAddress}
+        )
     </insert>
 
     <select id="getVisitCount" parameterType="int" resultType="Integer">
         SELECT COUNT(*) AS count FROM ifum.visits
     </select>
+
+
+
+
 </mapper>

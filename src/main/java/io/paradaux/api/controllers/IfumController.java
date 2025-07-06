@@ -1,11 +1,9 @@
 package io.paradaux.api.controllers;
 
+import io.paradaux.api.models.IfumVisit;
 import io.paradaux.api.models.annotations.ProtectedRoute;
 import io.paradaux.api.services.IfumService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/ifum")
@@ -19,8 +17,8 @@ public class IfumController {
 
     @ProtectedRoute
     @PostMapping("/visit")
-    public void insertVisit() {
-        ifumService.insertVisit();
+    public void insertVisit(@RequestBody IfumVisit visit) {
+        ifumService.insertVisit(visit);
     }
 
     @GetMapping("/visits")
