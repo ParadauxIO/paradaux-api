@@ -1,6 +1,7 @@
 package io.paradaux.api.services.impl;
 
 import io.paradaux.api.mappers.IfumMapper;
+import io.paradaux.api.models.IfumVisit;
 import io.paradaux.api.services.IfumService;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +15,8 @@ public class IfumServiceImpl implements IfumService {
     }
 
     @Override
-    public void insertVisit() {
-        ifumMapper.insertVisit();
+    public void insertVisit(IfumVisit visit) {
+        ifumMapper.insertVisit(visit);
     }
 
     @Override
