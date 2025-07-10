@@ -9,6 +9,8 @@
         <result property="createdAt" column="created_at"/>
     </resultMap>
 
+    <cache />
+
     <insert id="insertVisit" parameterType="IfumVisit">
         INSERT INTO ifum.visits (ip_address, user_agent)
         SELECT #{ipAddress}, #{userAgent}
