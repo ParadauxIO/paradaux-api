@@ -5,9 +5,10 @@ import lombok.Data;
 import java.sql.Timestamp;
 
 @Data
-public class IfumVisit {
+public class VisitEntry {
     private String ipAddress;
     private String userAgent;
     private int id;
     private Timestamp createdAt;
+    private String project;
 }

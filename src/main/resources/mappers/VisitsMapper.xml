@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.paradaux.api.mappers.VisitsMapper">
+    <cache />
+
+    <insert id="insertVisit" parameterType="VisitEntry" flushCache="true">
+        INSERT INTO analytics.visits (ip_address, user_agent, project)
+        SELECT #{ipAddress}, #{userAgent}, #{project}
+        WHERE NOT EXISTS (
+            SELECT 1 FROM analytics.visits WHERE ip_address = #{ipAddress} AND project = #{project}
+        )
+    </insert>
+
+    <select id="getVisitCount" parameterType="String" resultType="Integer">
+        SELECT total_count FROM analytics.visit_count_view WHERE project = #{project}
+    </select>
+
+    <update id="refreshVisitCache" flushCache="true">
+        REFRESH MATERIALIZED VIEW CONCURRENTLY analytics.visit_count_view;
+    </update>
+</mapper>
