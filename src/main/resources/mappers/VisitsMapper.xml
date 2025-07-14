@@ -18,6 +18,15 @@
         SELECT total_count FROM analytics.visit_count_view WHERE project = #{project}
     </select>
 
+    <resultMap id="visitCountResultMap" type="io.paradaux.api.models.VisitCountEntry">
+        <result property="totalCount" column="total_count" />
+        <result property="project" column="project" />
+    </resultMap>
+
+    <select id="getVisitCountsForProjects" resultMap="visitCountResultMap">
+        SELECT total_count, project FROM analytics.visit_count_view;
+    </select>
+
     <update id="refreshVisitCache" flushCache="true">
         REFRESH MATERIALIZED VIEW CONCURRENTLY analytics.visit_count_view;
     </update>
