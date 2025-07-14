@@ -18,9 +18,9 @@ public class VisitsServiceImpl implements VisitsService {
 
     private static final TreeSet<String> IGNORED_USER_AGENTS = new TreeSet<>(Arrays.asList(
             "bot", "crawler", "spider", "scanner", "curl", "wget",
-            "python", "java", "php", "unknown", "discord", "(compatible)",
+            "python", "java", "php", "unknown", "discord", "(compatible;",
             "zgrab", "scrapy", "censys", "okhttp", "axios", "go-http-client",
-            "google", "bing", "yahoo"
+            "google", "bing", "yahoo", "WhatCMS"
     ));
 
     private final VisitsMapper visitsMapper;
