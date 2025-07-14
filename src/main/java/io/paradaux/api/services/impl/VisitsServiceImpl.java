@@ -1,6 +1,7 @@
 package io.paradaux.api.services.impl;
 
 import io.paradaux.api.mappers.VisitsMapper;
+import io.paradaux.api.models.VisitCountEntry;
 import io.paradaux.api.models.VisitEntry;
 import io.paradaux.api.services.VisitsService;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
 
@@ -50,6 +52,11 @@ public class VisitsServiceImpl implements VisitsService {
     @Override
     public Integer getVisitCount(String project) {
         return visitsMapper.getVisitCount(project);
+    }
+
+    @Override
+    public List<VisitCountEntry> getVisitCountsForProjects() {
+        return visitsMapper.getVisitCountsForProjects();
     }
 
     @CacheEvict(value = "visitCounts", allEntries = true)

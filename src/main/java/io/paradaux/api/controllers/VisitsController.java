@@ -1,9 +1,12 @@
 package io.paradaux.api.controllers;
 
+import io.paradaux.api.models.VisitCountEntry;
 import io.paradaux.api.models.VisitEntry;
 import io.paradaux.api.models.annotations.ProtectedRoute;
 import io.paradaux.api.services.VisitsService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/analytics/visits")
@@ -24,5 +27,10 @@ public class VisitsController {
     @GetMapping("/project/{project}")
     public Integer getVisitCountByProject(@PathVariable String project) {
         return visitsService.getVisitCount(project);
+    }
+
+    @GetMapping("/projects")
+    public List<VisitCountEntry> getVisitCountsForProjects() {
+        return visitsService.getVisitCountsForProjects();
     }
 }
