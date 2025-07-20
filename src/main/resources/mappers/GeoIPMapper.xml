@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.paradaux.api.mappers.GeoIPMapper">
+
+    <insert id="insertLocations" parameterType="list">
+        INSERT INTO geoip.location (
+        geoname_id, locale_code, continent_code, continent_name,
+        country_iso_code, country_name, subdivision_1_iso_code,
+        subdivision_1_name, subdivision_2_iso_code, subdivision_2_name,
+        city_name, metro_code, time_zone, is_in_european_union
+        ) VALUES
+        <foreach collection="list" item="loc" separator=",">
+            (
+            #{loc.geonameId}, #{loc.localeCode}, #{loc.continentCode}, #{loc.continentName},
+            #{loc.countryIsoCode}, #{loc.countryName}, #{loc.subdivision1IsoCode},
+            #{loc.subdivision1Name}, #{loc.subdivision2IsoCode}, #{loc.subdivision2Name},
+            #{loc.cityName}, #{loc.metroCode}, #{loc.timeZone}, #{loc.isInEuropeanUnion}
+            )
+        </foreach>
+        ON CONFLICT (geoname_id) DO NOTHING
+    </insert>
+
+    <insert id="insertASNs" parameterType="list">
+        INSERT INTO geoip.autonomous_system (
+        autonomous_system_number, autonomous_system_organization
+        ) VALUES
+        <foreach collection="list" item="asn" separator=",">
+            (
+            #{asn.autonomousSystemNumber}, #{asn.autonomousSystemOrganization}
+            )
+        </foreach>
+        ON CONFLICT DO NOTHING
+    </insert>
+
+    <insert id="insertIPBlocks" parameterType="list">
+        INSERT INTO geoip.ip_block (
+        network, geoname_id, registered_country_geoname_id, represented_country_geoname_id,
+        is_anonymous_proxy, is_satellite_provider, postal_code,
+        latitude, longitude, accuracy_radius, is_anycast, autonomous_system_number
+        ) VALUES
+        <foreach collection="list" item="block" separator=",">
+            (
+            CAST(#{block.network} AS cidr), #{block.geonameId}, #{block.registeredCountryGeonameId}, #{block.representedCountryGeonameId},
+            #{block.isAnonymousProxy}, #{block.isSatelliteProvider}, #{block.postalCode},
+            #{block.latitude}, #{block.longitude}, #{block.accuracyRadius}, #{block.isAnycast}, #{block.autonomousSystemNumber}
+            )
+        </foreach>
+        ON CONFLICT DO NOTHING
+    </insert>
+</mapper>
