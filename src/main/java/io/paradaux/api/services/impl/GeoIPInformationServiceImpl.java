@@ -45,19 +45,11 @@ public class GeoIPInformationServiceImpl implements GeoIPInformationService {
         geoIPMapper.truncateAll();
 
         // Download zips from MaxMind
-        Path dataDir = Files.createTempDirectory("geoip-");
-        Path cityDir = dataDir.resolve("city");
-        Path asnDir = dataDir.resolve("asn");
-
-        String url = String.format(MAXMIND_DOWNLOAD_URL, "City", maxMindLicenseKey);
-        FileUtils.downloadAndExtractZip(url, cityDir);
-        url = String.format(MAXMIND_DOWNLOAD_URL, "ASN", maxMindLicenseKey);
-        FileUtils.downloadAndExtractZip(url, asnDir);
+        Path dataDir = downloadAllData();
 
         // Process and import data from MaxMind
         importAllData(dataDir);
     }
-
 
     public void importAllData(Path dataDir) {
         try {
@@ -89,11 +81,23 @@ public class GeoIPInformationServiceImpl implements GeoIPInformationService {
 
             // Wait for both to complete
             CompletableFuture.allOf(asnFuture, cityFuture).join();
-            log.info("All GeoIP data imported successfully from: " + dataDir);
+            log.info("All GeoIP data imported successfully from: {}", dataDir);
 
         } catch (Exception e) {
-            log.error("Failed to import GeoIP data from: " + dataDir, e);
+            log.error("Failed to import GeoIP data from: {}", dataDir, e);
         }
+    }
+
+    private Path downloadAllData() throws IOException {
+        Path dataDir = Files.createTempDirectory("geoip-");
+        Path cityDir = dataDir.resolve("city");
+        Path asnDir = dataDir.resolve("asn");
+
+        String url = String.format(MAXMIND_DOWNLOAD_URL, "City", maxMindLicenseKey);
+        FileUtils.downloadAndExtractZip(url, cityDir);
+        url = String.format(MAXMIND_DOWNLOAD_URL, "ASN", maxMindLicenseKey);
+        FileUtils.downloadAndExtractZip(url, asnDir);
+        return dataDir;
     }
 
     // Update method signatures to accept Path instead of String
@@ -126,7 +130,7 @@ public class GeoIPInformationServiceImpl implements GeoIPInformationService {
                 locations.add(loc);
             }
         }
-        log.info("Imported {} locations", locations.size());
+        log.debug("Imported {} locations", locations.size());
         batchInsert(locations, geoIPMapper::insertLocations);
     }
 
@@ -169,7 +173,7 @@ public class GeoIPInformationServiceImpl implements GeoIPInformationService {
             }
         }
 
-        log.info("Imported {} unique ASNs and {} ASN blocks", uniqueAsns.size(), asnBlocks.size());
+        log.debug("Imported {} unique ASNs and {} ASN blocks", uniqueAsns.size(), asnBlocks.size());
 
         // Insert ASNs first (due to foreign key constraint)
         batchInsert(new ArrayList<>(uniqueAsns.values()), geoIPMapper::insertASNs);
@@ -209,7 +213,7 @@ public class GeoIPInformationServiceImpl implements GeoIPInformationService {
             }
         }
 
-        log.info("Imported {} city blocks", cityBlocks.size());
+        log.debug("Imported {} city blocks", cityBlocks.size());
         batchInsert(cityBlocks, geoIPMapper::insertCityBlocks);
     }
 
@@ -220,7 +224,7 @@ public class GeoIPInformationServiceImpl implements GeoIPInformationService {
             try {
                 insertFunction.accept(batch);
                 if (i % (BATCH_SIZE * 10) == 0) {
-                    log.info("Processed {} records", i + batch.size());
+                    log.debug("Processed {} records", i + batch.size());
                 }
             } catch (Exception e) {
                 log.error("Failed to insert batch starting at index {}", i, e);
