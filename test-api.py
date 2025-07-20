@@ -6,7 +6,7 @@ from statistics import mean, median
 
 # Config
 # URL = "https://api.paradaux.io/api/ifum/visits"
-URL = "http://127.0.0.1:8080/api/visits/project/ifuckedur.mom"
+URL = "http://127.0.0.1:8080/api/analytics/visits/project/ifuckedur.mom"
 TOTAL_REQUESTS = 1500
 MAX_CONCURRENCY = 50
 

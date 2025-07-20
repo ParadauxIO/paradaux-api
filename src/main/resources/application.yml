@@ -6,6 +6,16 @@ spring:
     caffeine:
       spec: maximumSize=1000,expireAfterWrite=10m
 
+  data:
+    redis:
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-wait: -1ms
+          max-idle: 8
+          min-idle: 0
+
 cloudflare:
   turnstile:
     secret: ${CLOUDFLARE_TURNSTILE_SECRET}
@@ -16,3 +26,7 @@ discord:
 mybatis:
   type-aliases-package: io.paradaux.api.models
   mapper-locations: classpath:mappers/*.xml
+  type-handlers-package: io.paradaux.api.mappers.typehandlers
+
+maxmind:
+  base-url: https://download.maxmind.com/app/geoip_download

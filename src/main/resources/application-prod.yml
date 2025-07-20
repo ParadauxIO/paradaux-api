@@ -4,5 +4,15 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
 
+  data:
+    redis:
+      host: redis
+      port: 6379
+      password: ${REDIS_PASSWORD}
+
 api:
   secret: ${API_SECRET}
+
+maxmind:
+  user-id: ${MAXMIND_USER_ID}
+  license-key: ${MAXMIND_LICENSE_KEY}

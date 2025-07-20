@@ -22,7 +22,7 @@ public class VisitsServiceImpl implements VisitsService {
             "bot", "crawler", "spider", "scanner", "curl", "wget",
             "python", "java", "php", "unknown", "discord", "(compatible;",
             "zgrab", "scrapy", "censys", "okhttp", "axios", "go-http-client",
-            "google", "bing", "yahoo", "WhatCMS"
+            "google", "bing", "yahoo", "WhatCMS", "Palo Alto"
     ));
 
     private final VisitsMapper visitsMapper;
