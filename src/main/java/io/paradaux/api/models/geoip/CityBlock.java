@@ -3,7 +3,7 @@ package io.paradaux.api.models.geoip;
 import lombok.Data;
 
 @Data
-public class IPBlock {
+public class CityBlock {
     private String network;
     private Integer geonameId;
     private Integer registeredCountryGeonameId;
@@ -15,5 +15,4 @@ public class IPBlock {
     private Double longitude;
     private Integer accuracyRadius;
     private Boolean isAnycast;
-    private Integer autonomousSystemNumber;
 }

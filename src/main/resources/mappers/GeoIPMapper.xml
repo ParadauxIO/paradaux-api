@@ -31,22 +31,62 @@
             #{asn.autonomousSystemNumber}, #{asn.autonomousSystemOrganization}
             )
         </foreach>
-        ON CONFLICT DO NOTHING
+        ON CONFLICT (autonomous_system_number) DO NOTHING
     </insert>
 
-    <insert id="insertIPBlocks" parameterType="list">
-        INSERT INTO geoip.ip_block (
+    <insert id="insertCityBlocks" parameterType="list">
+        INSERT INTO geoip.city_block (
         network, geoname_id, registered_country_geoname_id, represented_country_geoname_id,
         is_anonymous_proxy, is_satellite_provider, postal_code,
-        latitude, longitude, accuracy_radius, is_anycast, autonomous_system_number
+        latitude, longitude, accuracy_radius, is_anycast
         ) VALUES
         <foreach collection="list" item="block" separator=",">
             (
-            CAST(#{block.network} AS cidr), #{block.geonameId}, #{block.registeredCountryGeonameId}, #{block.representedCountryGeonameId},
-            #{block.isAnonymousProxy}, #{block.isSatelliteProvider}, #{block.postalCode},
-            #{block.latitude}, #{block.longitude}, #{block.accuracyRadius}, #{block.isAnycast}, #{block.autonomousSystemNumber}
+            CAST(#{block.network} AS cidr), #{block.geonameId}, #{block.registeredCountryGeonameId},
+            #{block.representedCountryGeonameId}, #{block.isAnonymousProxy}, #{block.isSatelliteProvider},
+            #{block.postalCode}, #{block.latitude}, #{block.longitude}, #{block.accuracyRadius}, #{block.isAnycast}
             )
         </foreach>
-        ON CONFLICT DO NOTHING
+        ON CONFLICT (network) DO NOTHING
     </insert>
+
+    <insert id="insertASNBlocks" parameterType="list">
+        INSERT INTO geoip.asn_block (
+        network, autonomous_system_number
+        ) VALUES
+        <foreach collection="list" item="asnBlock" separator=",">
+            (
+            CAST(#{asnBlock.network} AS cidr), #{asnBlock.autonomousSystemNumber}
+            )
+        </foreach>
+        ON CONFLICT (network) DO NOTHING
+    </insert>
+
+    <!-- Query methods for the new schema -->
+    <select id="getIPInfo" parameterType="string" resultType="map">
+        SELECT * FROM geoip.get_ip_info(CAST(#{ipAddress} AS inet))
+    </select>
+
+    <select id="getCityBlockByIP" parameterType="string" resultType="io.paradaux.api.models.geoip.CityBlock">
+        SELECT cb.*, l.city_name, l.country_name, l.country_iso_code
+        FROM geoip.city_block cb
+                 LEFT JOIN geoip.location l ON cb.geoname_id = l.geoname_id
+        WHERE cb.network >>= CAST(#{ipAddress} AS inet)
+        ORDER BY masklen(cb.network) DESC
+        LIMIT 1
+    </select>
+
+    <select id="getASNByIP" parameterType="string" resultType="map">
+        SELECT ab.autonomous_system_number, asn.autonomous_system_organization
+        FROM geoip.asn_block ab
+                 LEFT JOIN geoip.autonomous_system asn ON ab.autonomous_system_number = asn.autonomous_system_number
+        WHERE ab.network >>= CAST(#{ipAddress} AS inet)
+        ORDER BY masklen(ab.network) DESC
+        LIMIT 1
+    </select>
+
+    <select id="getLocationById" parameterType="int" resultType="io.paradaux.api.models.geoip.IPLocation">
+        SELECT * FROM geoip.location WHERE geoname_id = #{geonameId}
+    </select>
+
 </mapper>
