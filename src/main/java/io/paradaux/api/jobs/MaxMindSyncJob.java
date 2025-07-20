@@ -4,6 +4,7 @@ import io.paradaux.api.services.DiscordService;
 import io.paradaux.api.services.GeoIPInformationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +20,12 @@ public class MaxMindSyncJob {
     private final DiscordService discordService;
 
     @Scheduled(cron = "0 0 3 * * WED")
-    public void refreshMaxMindDb() {
-        // Download all GeoIP data from MaxMind
+    public void refreshMaxMindDbScheduled() {
+        runSync();
+    }
+
+    @Async
+    public void runSync() {
         log.info("Starting MaxMind GeoIP data synchronization...");
         discordService.sendMessage("Starting MaxMind GeoIP data synchronization...", "", new HashMap<>());
 
