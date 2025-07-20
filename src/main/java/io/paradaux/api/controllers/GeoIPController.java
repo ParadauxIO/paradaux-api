@@ -2,6 +2,7 @@ package io.paradaux.api.controllers;
 
 import com.opencsv.exceptions.CsvValidationException;
 import io.paradaux.api.models.annotations.ProtectedRoute;
+import io.paradaux.api.services.GeoIPInformationService;
 import io.paradaux.api.services.impl.GeoIPInformationServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class GeoIPController {
 
-    private final GeoIPInformationServiceImpl geoIPInformationService;
+    private final GeoIPInformationService geoIPInformationService;
 
     @PostMapping("/sync")
     @ProtectedRoute

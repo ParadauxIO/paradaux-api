@@ -5,6 +5,7 @@ import io.paradaux.api.utils.IPUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -19,7 +20,7 @@ public class RateLimitingInterceptor implements HandlerInterceptor {
     private final ProtectedRouteInterceptor protectedRouteInterceptor;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
+    public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws IOException {
         String ip = IPUtils.getClientIp(request);
 
         // Allow requests that contain a valid secret token

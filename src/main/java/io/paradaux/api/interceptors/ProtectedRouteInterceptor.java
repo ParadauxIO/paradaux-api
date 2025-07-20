@@ -3,6 +3,7 @@ package io.paradaux.api.interceptors;
 import io.paradaux.api.models.annotations.ProtectedRoute;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
@@ -25,7 +26,7 @@ public class ProtectedRouteInterceptor implements HandlerInterceptor {
      * If the secret is invalid or missing, it responds with HTTP 401 Unauthorized.
      */
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
         if (handler instanceof HandlerMethod method) {
             if (!isProtectedRoute(method)) {
                 return true;
@@ -42,10 +43,9 @@ public class ProtectedRouteInterceptor implements HandlerInterceptor {
     /**
      * A route is protected if the method or its class is annotated with @ProtectedRoute.
      * This requires a secret token in the request header "X-SECRET".
-     * */
+     */
     private boolean isProtectedRoute(HandlerMethod method) {
-        return protectedRouteCache.computeIfAbsent(method, hm -> hm.hasMethodAnnotation(ProtectedRoute.class)
-                || hm.getBeanType().isAnnotationPresent(ProtectedRoute.class));
+        return protectedRouteCache.computeIfAbsent(method, hm -> hm.hasMethodAnnotation(ProtectedRoute.class) || hm.getBeanType().isAnnotationPresent(ProtectedRoute.class));
     }
 
     /**

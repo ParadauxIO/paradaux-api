@@ -17,7 +17,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(protectedRouteInterceptor);
-        registry.addInterceptor(rateLimitingInterceptor)
-                .addPathPatterns("/**");
+        registry.addInterceptor(rateLimitingInterceptor).addPathPatterns("/**");
     }
 }

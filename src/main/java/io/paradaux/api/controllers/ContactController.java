@@ -2,7 +2,7 @@ package io.paradaux.api.controllers;
 
 import io.paradaux.api.models.ContactFormRequest;
 import io.paradaux.api.services.ContactService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,10 +12,10 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/contact")
+@RequiredArgsConstructor
 public class ContactController {
 
-    @Autowired
-    private ContactService contactService;
+    private final ContactService contactService;
 
     @PostMapping
     public Mono<ResponseEntity<String>> handleContactForm(@RequestBody ContactFormRequest request) {
