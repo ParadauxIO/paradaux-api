@@ -1,3 +1,4 @@
+-- Went to production on 20/7/2025
 CREATE SCHEMA IF NOT EXISTS geoip;
 
 CREATE TABLE geoip.location

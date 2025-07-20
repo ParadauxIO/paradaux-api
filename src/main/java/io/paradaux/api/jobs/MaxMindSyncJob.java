@@ -33,6 +33,8 @@ public class MaxMindSyncJob {
             geoIPInformationService.importAllData();
         } catch (IOException e) {
             log.error("Failed to import MaxMind GeoIP data", e);
+            discordService.sendMessage("MaxMind GeoIP data synchronization failure", e.getMessage(), new HashMap<>());
+            return;
         }
 
         discordService.sendMessage("MaxMind GeoIP data synchronization completed successfully", "", new HashMap<>());
