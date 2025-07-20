@@ -12,3 +12,6 @@ spring:
 
 api:
   secret: ${API_SECRET}
+
+maxmind:
+  license-key: ${MAXMIND_LICENSE_KEY}

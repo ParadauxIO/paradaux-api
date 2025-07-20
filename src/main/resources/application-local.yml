@@ -16,4 +16,3 @@ api:
 
 maxmind:
   license-key: ${MAXMIND_LICENSE_KEY}
-  user-id: ${MAXMIND_USER_ID}
