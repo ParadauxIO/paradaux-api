@@ -39,6 +39,7 @@ dependencies {
     // Utilities
     implementation("org.apache.commons:commons-compress:1.24.0")
     implementation("org.apache.commons:commons-lang3:3.13.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     // Caching
     implementation("org.springframework.boot:spring-boot-starter-cache")

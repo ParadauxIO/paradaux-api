@@ -19,4 +19,6 @@ public interface GeoIPMapper {
     CityBlock getCityBlockByIP(String ipAddress);
     Map<String, Object> getASNByIP(String ipAddress);
     IPLocation getLocationById(Integer geonameId);
+
+    void truncateAll();
 }

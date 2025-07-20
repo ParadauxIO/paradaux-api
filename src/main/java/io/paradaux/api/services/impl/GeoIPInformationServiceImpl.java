@@ -8,12 +8,16 @@ import io.paradaux.api.models.geoip.ASNBlock;
 import io.paradaux.api.models.geoip.CityBlock;
 import io.paradaux.api.models.geoip.IPLocation;
 import io.paradaux.api.services.GeoIPInformationService;
+import io.paradaux.api.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,21 +34,43 @@ public class GeoIPInformationServiceImpl implements GeoIPInformationService {
 
     private final GeoIPMapper geoIPMapper;
 
-    String cityLocationsFile = "C:\\Workspace\\data-wrangling\\geoip\\GeoLite2-City-CSV_20250718\\GeoLite2-City-Locations-en.csv";
-    String asnBlocksIPv4File = "C:\\Workspace\\data-wrangling\\geoip\\GeoLite2-ASN-CSV_20250720\\GeoLite2-ASN-Blocks-IPv4.csv";
-    String asnBlocksIPv6File = "C:\\Workspace\\data-wrangling\\geoip\\GeoLite2-ASN-CSV_20250720\\GeoLite2-ASN-Blocks-IPv6.csv";
-    String cityBlocksIPv4File = "C:\\Workspace\\data-wrangling\\geoip\\GeoLite2-City-CSV_20250718\\GeoLite2-City-Blocks-IPv4.csv";
-    String cityBlocksIPv6File = "C:\\Workspace\\data-wrangling\\geoip\\GeoLite2-City-CSV_20250718\\GeoLite2-City-Blocks-IPv6.csv";
+    @Value("${maxmind.license-key}")
+    private String maxMindLicenseKey;
 
-    public void importAllData() {
+    private static final String MAXMIND_DOWNLOAD_URL = "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-%s-CSV&license_key=%s&suffix=zip";
+
+
+    public void importAllData() throws IOException {
+        // Clear existing data
+        geoIPMapper.truncateAll();
+
+        // Download zips from MaxMind
+        Path dataDir = Files.createTempDirectory("geoip-");
+        Path cityDir = dataDir.resolve("city");
+        Path asnDir = dataDir.resolve("asn");
+
+        String url = String.format(MAXMIND_DOWNLOAD_URL, "City", maxMindLicenseKey);
+        FileUtils.downloadAndExtractZip(url, cityDir);
+        url = String.format(MAXMIND_DOWNLOAD_URL, "ASN", maxMindLicenseKey);
+        FileUtils.downloadAndExtractZip(url, asnDir);
+
+        // Process and import data from MaxMind
+        importAllData(dataDir);
+    }
+
+
+    public void importAllData(Path dataDir) {
         try {
-            // Import locations first
-            importLocations(cityLocationsFile);
+            // Import locations first - use Path instead of String
+            importLocations(dataDir.resolve("city/GeoLite2-City-Locations-en.csv"));
 
             // Import ASNs and ASN blocks in parallel with city blocks
             CompletableFuture<Void> asnFuture = CompletableFuture.runAsync(() -> {
                 try {
-                    importASNsAndBlocks(asnBlocksIPv4File, asnBlocksIPv6File);
+                    importASNsAndBlocks(
+                            dataDir.resolve("asn/GeoLite2-ASN-Blocks-IPv4.csv"),
+                            dataDir.resolve("asn/GeoLite2-ASN-Blocks-IPv6.csv")
+                    );
                 } catch (Exception e) {
                     log.error("Failed to import ASN data", e);
                 }
@@ -52,7 +78,10 @@ public class GeoIPInformationServiceImpl implements GeoIPInformationService {
 
             CompletableFuture<Void> cityFuture = CompletableFuture.runAsync(() -> {
                 try {
-                    importCityBlocks(cityBlocksIPv4File, cityBlocksIPv6File);
+                    importCityBlocks(
+                            dataDir.resolve("city/GeoLite2-City-Blocks-IPv4.csv"),
+                            dataDir.resolve("city/GeoLite2-City-Blocks-IPv6.csv")
+                    );
                 } catch (Exception e) {
                     log.error("Failed to import city blocks", e);
                 }
@@ -60,16 +89,17 @@ public class GeoIPInformationServiceImpl implements GeoIPInformationService {
 
             // Wait for both to complete
             CompletableFuture.allOf(asnFuture, cityFuture).join();
+            log.info("All GeoIP data imported successfully from: " + dataDir);
 
-            log.info("All GeoIP data imported successfully");
         } catch (Exception e) {
-            log.error("Failed to import locations", e);
+            log.error("Failed to import GeoIP data from: " + dataDir, e);
         }
     }
 
-    private void importLocations(String csvPath) throws IOException, CsvValidationException {
+    // Update method signatures to accept Path instead of String
+    private void importLocations(Path csvPath) throws IOException, CsvValidationException {
         List<IPLocation> locations = new ArrayList<>();
-        try (CSVReader reader = new CSVReader(new FileReader(csvPath))) {
+        try (CSVReader reader = new CSVReader(new FileReader(csvPath.toFile()))) {
             reader.readNext(); // skip header
             String[] line;
             while ((line = reader.readNext()) != null) {
@@ -100,12 +130,12 @@ public class GeoIPInformationServiceImpl implements GeoIPInformationService {
         batchInsert(locations, geoIPMapper::insertLocations);
     }
 
-    private void importASNsAndBlocks(String... csvPaths) throws IOException, CsvValidationException {
+    private void importASNsAndBlocks(Path... csvPaths) throws IOException, CsvValidationException {
         Map<Integer, ASN> uniqueAsns = new HashMap<>();
         List<ASNBlock> asnBlocks = new ArrayList<>();
 
-        for (String csvPath : csvPaths) {
-            try (CSVReader reader = new CSVReader(new FileReader(csvPath))) {
+        for (Path csvPath : csvPaths) {
+            try (CSVReader reader = new CSVReader(new FileReader(csvPath.toFile()))) {
                 reader.readNext(); // skip header
                 String[] line;
                 while ((line = reader.readNext()) != null) {
@@ -148,11 +178,11 @@ public class GeoIPInformationServiceImpl implements GeoIPInformationService {
         batchInsert(asnBlocks, geoIPMapper::insertASNBlocks);
     }
 
-    private void importCityBlocks(String... csvPaths) throws IOException, CsvValidationException {
+    private void importCityBlocks(Path... csvPaths) throws IOException, CsvValidationException {
         List<CityBlock> cityBlocks = new ArrayList<>();
 
-        for (String csvPath : csvPaths) {
-            try (CSVReader reader = new CSVReader(new FileReader(csvPath))) {
+        for (Path csvPath : csvPaths) {
+            try (CSVReader reader = new CSVReader(new FileReader(csvPath.toFile()))) {
                 reader.readNext(); // skip header
                 String[] line;
                 while ((line = reader.readNext()) != null) {

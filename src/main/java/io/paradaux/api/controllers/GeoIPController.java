@@ -24,6 +24,11 @@ public class GeoIPController {
     @PostMapping("/sync")
     @ProtectedRoute
     public void syncGeoIPData() {
-        geoIPInformationService.importAllData();
+        try {
+            log.info("Starting GeoIP data synchronization...");
+            geoIPInformationService.importAllData();
+        } catch (IOException e) {
+            log.error("Failed to import GeoIP data", e);
+        }
     }
 }

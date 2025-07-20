@@ -89,4 +89,7 @@
         SELECT * FROM geoip.location WHERE geoname_id = #{geonameId}
     </select>
 
+    <delete id="truncateAll">
+        TRUNCATE TABLE geoip.location, geoip.autonomous_system, geoip.city_block, geoip.asn_block CASCADE
+    </delete>
 </mapper>
