@@ -37,7 +37,10 @@ public class GeoIPInformationServiceImpl implements GeoIPInformationService {
     @Value("${maxmind.license-key}")
     private String maxMindLicenseKey;
 
-    private static final String MAXMIND_DOWNLOAD_URL = "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-%s-CSV&license_key=%s&suffix=zip";
+    @Value("${maxmind.user-id}")
+    private String maxMindUserId;
+
+    private static final String MAXMIND_DOWNLOAD_URL = "https://download.maxmind.com/geoip/databases/GeoLite2-%s-CSV/download?suffix=zip";
 
     @Override
     public Map<String, Object> lookupIP(String ipAddress) {
@@ -125,10 +128,10 @@ public class GeoIPInformationServiceImpl implements GeoIPInformationService {
         Path cityDir = dataDir.resolve("city");
         Path asnDir = dataDir.resolve("asn");
 
-        String url = String.format(MAXMIND_DOWNLOAD_URL, "City", maxMindLicenseKey);
-        FileUtils.downloadAndExtractZip(url, cityDir);
-        url = String.format(MAXMIND_DOWNLOAD_URL, "ASN", maxMindLicenseKey);
-        FileUtils.downloadAndExtractZip(url, asnDir);
+        String url = String.format(MAXMIND_DOWNLOAD_URL, "City");
+        FileUtils.downloadAndExtractZip(url, cityDir, maxMindUserId, maxMindLicenseKey);
+        url = String.format(MAXMIND_DOWNLOAD_URL, "ASN");
+        FileUtils.downloadAndExtractZip(url, asnDir,  maxMindUserId, maxMindLicenseKey);
         return dataDir;
     }
 

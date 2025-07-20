@@ -1,5 +1,6 @@
 package io.paradaux.api.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -10,10 +11,12 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+@Slf4j
 public class FileUtils {
     private static final int BUFFER_SIZE = 8192; // 8KB buffer
     private static final OkHttpClient client = new OkHttpClient.Builder()
@@ -29,9 +32,12 @@ public class FileUtils {
      * @param extractDir The directory path where files should be extracted
      * @throws IOException if download or extraction fails
      */
-    public static void downloadAndExtractZip(String url, Path extractDir) throws IOException {
+    public static void downloadAndExtractZip(String url, Path extractDir, String username, String password) throws IOException {
+        String basicAuth = "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
+        log.info("Downloading ZIP from URL: {}", url);
         Request request = new Request.Builder()
                 .url(url)
+                .header("Authorization", basicAuth)
                 .build();
 
         try (Response response = client.newCall(request).execute()) {

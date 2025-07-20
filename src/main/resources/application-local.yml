@@ -15,4 +15,5 @@ api:
   secret: test
 
 maxmind:
+  user-id: ${MAXMIND_USER_ID}
   license-key: ${MAXMIND_LICENSE_KEY}
