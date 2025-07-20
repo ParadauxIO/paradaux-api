@@ -30,7 +30,15 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.postgresql:postgresql:42.7.3")
+
+    implementation("com.maxmind.geoip2:geoip2:4.2.0")
+    implementation("com.opencsv:opencsv:5.8")
+
+    // Utilities
+    implementation("org.apache.commons:commons-compress:1.24.0")
+    implementation("org.apache.commons:commons-lang3:3.13.0")
 
     // Caching
     implementation("org.springframework.boot:spring-boot-starter-cache")
@@ -43,12 +51,14 @@ dependencies {
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
 
-
-
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+configurations.all {
+    exclude(group = "commons-logging", module = "commons-logging")
 }
 
 tasks.withType<Test> {
