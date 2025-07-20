@@ -1,6 +1,5 @@
 package io.paradaux.api.jobs;
 
-import io.paradaux.api.mappers.GeoIPMapper;
 import io.paradaux.api.services.DiscordService;
 import io.paradaux.api.services.GeoIPInformationService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +16,6 @@ import java.util.HashMap;
 public class MaxMindSyncJob {
 
     private final GeoIPInformationService geoIPInformationService;
-    private final GeoIPMapper geoIPMapper;
     private final DiscordService discordService;
 
     @Scheduled(cron = "0 0 3 * * WED")

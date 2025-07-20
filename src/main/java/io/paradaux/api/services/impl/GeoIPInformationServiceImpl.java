@@ -39,6 +39,39 @@ public class GeoIPInformationServiceImpl implements GeoIPInformationService {
 
     private static final String MAXMIND_DOWNLOAD_URL = "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-%s-CSV&license_key=%s&suffix=zip";
 
+    @Override
+    public Map<String, Object> lookupIP(String ipAddress) {
+        Map<String, Object> result = new HashMap<>();
+
+        CityBlock cityBlock = getCityBlock(ipAddress);
+        result.put("ip", ipAddress);
+        result.put("details", getIPDetails(ipAddress));
+        result.put("asn", getASNDetails(ipAddress));
+        result.put("city", cityBlock);
+        result.put("location", cityBlock != null ? geoIPMapper.getLocationById(cityBlock.getGeonameId()) : null);
+        result.put("attribution", "This database incorporates GeoNames [https://www.geonames.org] geographical data, which is made available under the Creative Commons Attribution 4.0 License. To view a copy of this license, visit https://creativecommons.org/licenses/by/4.0");
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getIPDetails(String ipAddress) {
+        return geoIPMapper.getIPInfo(ipAddress);
+    }
+
+    @Override
+    public CityBlock getCityBlock(String ipAddress) {
+        return geoIPMapper.getCityBlockByIP(ipAddress);
+    }
+
+    @Override
+    public Map<String, Object> getASNDetails(String ipAddress) {
+        return geoIPMapper.getASNByIP(ipAddress);
+    }
+
+    @Override
+    public IPLocation getLocationByGeoNameId(Integer geonameId) {
+        return geoIPMapper.getLocationById(geonameId);
+    }
 
     public void importAllData() throws IOException {
         // Clear existing data

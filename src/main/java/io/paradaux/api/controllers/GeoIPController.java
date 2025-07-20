@@ -5,11 +5,10 @@ import io.paradaux.api.services.GeoIPInformationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/geoip")
@@ -19,6 +18,11 @@ import java.io.IOException;
 public class GeoIPController {
 
     private final GeoIPInformationService geoIPInformationService;
+
+    @GetMapping("/lookup/{ipAddress}")
+    public Map<String, Object> lookup(@PathVariable String ipAddress) {
+        return geoIPInformationService.lookupIP(ipAddress);
+    }
 
     @PostMapping("/sync")
     @ProtectedRoute

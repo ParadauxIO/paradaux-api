@@ -17,7 +17,7 @@ public class RateLimitingServiceImpl implements RateLimitingService {
     private final RedisTemplate<String, String> redisTemplate;
 
     private static final long TIME_WINDOW = 60_000; // 1 min
-    private static final int MAX_REQUESTS = 10;
+    private static final int MAX_REQUESTS = 75;
 
     @Override
     public boolean isAllowed(String key) {
