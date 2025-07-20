@@ -4,6 +4,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import org.springframework.util.StreamUtils;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -114,6 +115,68 @@ public class FileUtils {
                         }
                     }
                     zipStream2.closeEntry();
+                }
+            }
+        }
+    }
+
+    public static void extractZip(InputStream inputStream, Path extractDir) throws IOException {
+        List<ZipEntry> entries = new ArrayList<>();
+        String commonRoot = null;
+
+        try (BufferedInputStream bis = new BufferedInputStream(inputStream);
+             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            StreamUtils.copy(bis, baos);
+            byte[] zipBytes = baos.toByteArray();
+
+            try (ZipInputStream zipStream = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
+                ZipEntry entry;
+                while ((entry = zipStream.getNextEntry()) != null) {
+                    entries.add(new ZipEntry(entry));
+                    zipStream.closeEntry();
+                }
+            }
+
+            if (!entries.isEmpty()) {
+                String firstName = entries.get(0).getName();
+                int slash = firstName.indexOf('/');
+                if (slash > 0) {
+                    String potentialRoot = firstName.substring(0, slash + 1);
+                    boolean allShareRoot = entries.stream()
+                            .allMatch(e -> e.getName().startsWith(potentialRoot));
+                    if (allShareRoot) commonRoot = potentialRoot;
+                }
+            }
+
+            try (ZipInputStream zipStream = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
+                ZipEntry entry;
+                while ((entry = zipStream.getNextEntry()) != null) {
+                    String name = entry.getName();
+                    if (commonRoot != null && name.startsWith(commonRoot)) {
+                        name = name.substring(commonRoot.length());
+                    }
+
+                    if (name.isEmpty()) {
+                        zipStream.closeEntry();
+                        continue;
+                    }
+
+                    Path targetPath = extractDir.resolve(name);
+                    if (entry.isDirectory()) {
+                        Files.createDirectories(targetPath);
+                    } else {
+                        Files.createDirectories(targetPath.getParent());
+                        try (OutputStream os = Files.newOutputStream(targetPath);
+                             BufferedOutputStream bos = new BufferedOutputStream(os, BUFFER_SIZE)) {
+                            byte[] buffer = new byte[BUFFER_SIZE];
+                            int len;
+                            while ((len = zipStream.read(buffer)) > 0) {
+                                bos.write(buffer, 0, len);
+                            }
+                        }
+                    }
+
+                    zipStream.closeEntry();
                 }
             }
         }

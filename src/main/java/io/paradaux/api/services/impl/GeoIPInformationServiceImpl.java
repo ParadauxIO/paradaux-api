@@ -74,9 +74,6 @@ public class GeoIPInformationServiceImpl implements GeoIPInformationService {
     }
 
     public void importAllData() throws IOException {
-        // Clear existing data
-        geoIPMapper.truncateAll();
-
         // Download zips from MaxMind
         Path dataDir = downloadAllData();
 
@@ -85,6 +82,8 @@ public class GeoIPInformationServiceImpl implements GeoIPInformationService {
     }
 
     public void importAllData(Path dataDir) {
+        geoIPMapper.truncateAll();
+
         try {
             // Import locations first - use Path instead of String
             importLocations(dataDir.resolve("city/GeoLite2-City-Locations-en.csv"));

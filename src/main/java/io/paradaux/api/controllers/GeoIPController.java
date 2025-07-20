@@ -8,9 +8,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
+
+import static io.paradaux.api.utils.FileUtils.extractZip;
 
 @RestController
 @RequestMapping("/api/geoip")
@@ -32,5 +38,35 @@ public class GeoIPController {
     public ResponseEntity<String> syncGeoIPData() {
         maxMindSyncJob.runSync();
         return ResponseEntity.accepted().body("MaxMind sync started");
+    }
+
+    @PostMapping("/upload-zips")
+    @ProtectedRoute
+    public ResponseEntity<String> uploadZips(
+            @RequestParam("city") MultipartFile cityZip,
+            @RequestParam("asn") MultipartFile asnZip) {
+
+        try {
+            Path dataDir = Files.createTempDirectory("geoip-");
+            Path cityDir = dataDir.resolve("city");
+            Path asnDir = dataDir.resolve("asn");
+
+            Files.createDirectories(cityDir);
+            Files.createDirectories(asnDir);
+
+            extractZip(cityZip.getInputStream(), cityDir);
+            extractZip(asnZip.getInputStream(), asnDir);
+
+            return ResponseEntity.ok(dataDir.toAbsolutePath().toString());
+        } catch (IOException e) {
+            log.error("Failed to extract uploaded ZIPs", e);
+            return ResponseEntity.internalServerError().body("Extraction failed: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/process-uploaded-data")
+    @ProtectedRoute
+    public void importAllData(@RequestBody String path) {
+        geoIPInformationService.importAllData(Paths.get(path));
     }
 }
