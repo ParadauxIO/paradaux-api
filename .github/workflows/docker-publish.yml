@@ -17,18 +17,24 @@ jobs:
       - name: Compute tags
         id: tags
         run: |
-          # Immutable tag — Argo CD Image Updater watches `sha-<short>` and bumps
-          # the manifest. Mutable tag kept for transition / manual rollbacks.
+          # Env-prefixed immutable tag — Argo CD Image Updater watches
+          # `<env>-sha-<short>` per overlay. Prefix MUST match the kustomize
+          # overlay directory name (development / production) so the regex
+          # `^{{path.basename}}-sha-…` in bootstrap/registrations/apps.yaml
+          # picks the right tag per environment. Mutable tag kept for
+          # transition / manual rollbacks; drop once everything's switched.
           SHORT_SHA=${GITHUB_SHA::7}
           if [ "${{ github.ref_name }}" == "main" ]; then
+            ENV_NAME=production
             MUTABLE=prod
           elif [ "${{ github.ref_name }}" == "develop" ]; then
+            ENV_NAME=development
             MUTABLE=latest
           else
             echo "Unsupported branch: ${{ github.ref_name }}"
             exit 1
           fi
-          echo "SHA_TAG=sha-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "SHA_TAG=${ENV_NAME}-sha-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
           echo "MUTABLE_TAG=${MUTABLE}" >> "$GITHUB_OUTPUT"
 
       - name: Log in to Harbor registry
