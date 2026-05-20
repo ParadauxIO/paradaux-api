@@ -30,3 +30,21 @@ mybatis:
 
 maxmind:
   base-url: https://download.maxmind.com/app/geoip_download
+
+# Actuator on a dedicated management port (8081) so /actuator/prometheus is
+# reachable in-cluster (ServiceMonitor) but never via the public api.paradaux.io
+# route, which only fronts the app port (8080).
+management:
+  server:
+    port: ${MANAGEMENT_PORT:8081}
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
