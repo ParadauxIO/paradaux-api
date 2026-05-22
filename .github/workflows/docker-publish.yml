@@ -14,17 +14,28 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Set Docker image tag based on branch
-        id: set-tag
+      - name: Compute tags
+        id: tags
         run: |
+          # Env-prefixed immutable tag — Argo CD Image Updater watches
+          # `<env>-sha-<short>` per overlay. Prefix MUST match the kustomize
+          # overlay directory name (development / production) so the regex
+          # `^{{path.basename}}-sha-…` in bootstrap/registrations/apps.yaml
+          # picks the right tag per environment. Mutable tag kept for
+          # transition / manual rollbacks; drop once everything's switched.
+          SHORT_SHA=${GITHUB_SHA::7}
           if [ "${{ github.ref_name }}" == "main" ]; then
-            echo "TAG=prod" >> $GITHUB_OUTPUT
+            ENV_NAME=production
+            MUTABLE=prod
           elif [ "${{ github.ref_name }}" == "develop" ]; then
-            echo "TAG=latest" >> $GITHUB_OUTPUT
+            ENV_NAME=development
+            MUTABLE=latest
           else
             echo "Unsupported branch: ${{ github.ref_name }}"
             exit 1
           fi
+          echo "SHA_TAG=${ENV_NAME}-sha-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "MUTABLE_TAG=${MUTABLE}" >> "$GITHUB_OUTPUT"
 
       - name: Log in to Harbor registry
         uses: docker/login-action@v3
@@ -35,8 +46,14 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.HARBOR_REGISTRY }}/paradaux-public/paradaux-api:${{ steps.set-tag.outputs.TAG }} .
+          IMAGE=${{ secrets.HARBOR_REGISTRY }}/paradaux-public/paradaux-api
+          docker build \
+            -t "${IMAGE}:${{ steps.tags.outputs.SHA_TAG }}" \
+            -t "${IMAGE}:${{ steps.tags.outputs.MUTABLE_TAG }}" \
+            .
 
       - name: Push Docker image
         run: |
-          docker push ${{ secrets.HARBOR_REGISTRY }}/paradaux-public/paradaux-api:${{ steps.set-tag.outputs.TAG }}
+          IMAGE=${{ secrets.HARBOR_REGISTRY }}/paradaux-public/paradaux-api
+          docker push "${IMAGE}:${{ steps.tags.outputs.SHA_TAG }}"
+          docker push "${IMAGE}:${{ steps.tags.outputs.MUTABLE_TAG }}"

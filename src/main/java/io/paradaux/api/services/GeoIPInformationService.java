@@ -10,7 +10,7 @@ import java.util.Map;
 public interface GeoIPInformationService {
 
     void importAllData() throws IOException;
-    void importAllData(Path dataDir);
+    void importAllData(Path dataDir) throws IOException;
     Map<String, Object> getIPDetails(String ipAddress);
     CityBlock getCityBlock(String ipAddress);
     Map<String, Object> getASNDetails(String ipAddress);
