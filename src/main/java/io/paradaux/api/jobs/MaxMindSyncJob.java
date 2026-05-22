@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.HashMap;
 
 @Service
@@ -31,9 +30,12 @@ public class MaxMindSyncJob {
 
         try {
             geoIPInformationService.importAllData();
-        } catch (IOException e) {
+        } catch (Exception e) {
+            // Catch Exception (not just IOException) — mybatis surfaces DB failures as
+            // unchecked exceptions, and those must still alert + abort, not be lost.
             log.error("Failed to import MaxMind GeoIP data", e);
-            discordService.sendMessage("MaxMind GeoIP data synchronization failure", e.getMessage(), new HashMap<>());
+            discordService.sendMessage("MaxMind GeoIP data synchronization failure",
+                    String.valueOf(e.getMessage()), new HashMap<>());
             return;
         }
 
