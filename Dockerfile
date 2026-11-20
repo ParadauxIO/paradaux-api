@@ -17,7 +17,9 @@ RUN chmod +x ./gradlew
 RUN ./gradlew clean bootJar -x test
 
 # ---- Runtime Stage ----
-FROM gcr.io/distroless/java21-debian12:nonroot
+# debian13: java21-debian12 is frozen at the affected 21.0.10; debian13 ships the
+# Java4Shell (CVE-2026-114938) fix, 21.0.13.1.
+FROM gcr.io/distroless/java21-debian13:nonroot
 
 WORKDIR /app
 
