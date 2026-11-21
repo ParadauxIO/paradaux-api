@@ -33,6 +33,9 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus")
 
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    // Schema migrations (src/main/resources/db/migration); versions managed by Spring Boot.
+    implementation("org.flywaydb:flyway-core")
+    implementation("org.flywaydb:flyway-database-postgresql")
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.postgresql:postgresql:42.7.3")
