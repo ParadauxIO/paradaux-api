@@ -16,6 +16,16 @@ spring:
           max-idle: 8
           min-idle: 0
 
+  # Schema migrations run at startup from classpath:db/migration.
+  # V1-V3 were applied by hand before Flyway, so a database that already has
+  # these schemas but no history table is baselined at 3 instead of re-running
+  # them; an empty database gets V1-V3. History: api.flyway_schema_history.
+  flyway:
+    schemas: api,analytics,geoip
+    baseline-on-migrate: true
+    baseline-version: 3
+    baseline-description: "Pre-Flyway schema (V1-V3 applied by hand)"
+
 cloudflare:
   turnstile:
     secret: ${CLOUDFLARE_TURNSTILE_SECRET}
